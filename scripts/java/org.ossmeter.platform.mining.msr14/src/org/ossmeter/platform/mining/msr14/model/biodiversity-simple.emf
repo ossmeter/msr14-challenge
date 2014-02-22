@@ -1,0 +1,45 @@
+package org.ossmeter.platform.mining.msr14.model;
+
+@db
+class Biodiversity {
+	val User[*] users;
+	val Project[*] projects;
+	val ProjectMembership[*] projectMemberships;
+}
+
+abstract class Measureable {	
+	attr int numberOfCommits;
+	attr int numberOfIssues;
+	attr int numberOfCommitComments;
+	attr int numberOfIssueComments;
+	attr int numberOfPullRequests;
+	attr int numberOfPullRequestComments;
+}
+
+class User extends Measureable {
+	// Extracted from user collection 
+	attr String login;
+	attr String ghId;
+	ref ProjectMembership[*] projects;
+}
+
+class ProjectMembership extends Measureable {
+	attr boolean owner;
+	attr boolean orgMember;
+	attr boolean collaborator;
+	attr String projectName;	// Utility field: compound index with projectOwner
+	attr String projectOwner;	// Utility field: compound index with projectName
+	attr String userName;		// Utility field: single field index
+	ref Project project;
+	ref User user;
+}
+
+class Project extends Measureable {
+	// Stripped directly from repo collection
+	attr String ghId;
+	attr String name;			// Compound index with ownerName
+	attr String ownerName; 		// Compound index with name
+	attr String createdAt;
+	// Inferred	from other collections
+	ref User owner;
+}
